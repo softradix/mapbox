@@ -141,8 +141,6 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
             val lat = coordinates?.get(1)
             val long = coordinates?.get(0)
             directionsStart(lat!!, long!!)
-            Log.e("Place", "onCreate:${it.coordinate}")
-            Log.e("Maki Icon", "onCreate:${it.makiIcon}")
             viewGoneSearch()
             navigateToPlace(lat, long)
         }
