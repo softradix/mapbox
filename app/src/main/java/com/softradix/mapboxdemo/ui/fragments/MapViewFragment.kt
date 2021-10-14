@@ -69,8 +69,6 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
 
     private lateinit var client: MapboxDirections
 
-    private lateinit var mapboxNavigation: MapboxNavigation
-
     private var origin: Point? = null
     private var destination: Point? = null
 
@@ -111,6 +109,7 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
 
         searchFunction()
 
+        // for network check
         receiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 val status = NetworkUtil.getConnectivityStatusString(requireActivity())
@@ -128,10 +127,13 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         )
 
-
-
         return mapFragmentMapViewBinding.root
     }
+
+    /**
+     * search places and get coordinates for directions
+     * also view handling for search UI of MAPBOX
+     **/
 
     private fun searchFunction() {
         mapFragmentMapViewBinding.searchView.addOnSearchResultClickListener {
@@ -164,6 +166,9 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
 
     }
 
+    /**
+     * handling of directions and creating route on map
+     **/
     private fun navigateToPlace(lat: Double?, long: Double?) {
         val symbolManager = SymbolManager(mapFragmentMapViewBinding.mapView, mapboxMap, mStyle)
         val symbol =
@@ -210,6 +215,11 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
         }
     }
 
+
+    /**
+     * Users current location get set here
+     * Permission also called here
+     **/
     private fun enableLocationComponent(loadedMapStyle: Style) {
 
         // Check if permissions are enabled and if not request
@@ -277,7 +287,10 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
         mapFragmentMapViewBinding.btSearch.visibility = View.VISIBLE
     }
 
-
+    /**
+     * map ready function loads the style and all the components
+     * get current location on start
+     **/
     override fun onMapReady(mapboxMap: MapboxMap) {
 
         this.mapboxMap = mapboxMap
@@ -296,6 +309,10 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
         }
     }
 
+
+    /**
+     * responsible for all the possible directions fetching
+     **/
     private fun directionsStart(searchLat: Double, searchLng: Double) {
         val lat = mapboxMap.locationComponent.lastKnownLocation!!.latitude
         val lng = mapboxMap.locationComponent.lastKnownLocation!!.longitude
@@ -354,7 +371,7 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
 
     }
 
-    //here we are
+    //set route view and markers
     private fun initSource(loadedMapStyle: Style) {
         val geoJson = GeoJsonSource(ROUTE_SOURCE_ID)
         loadedMapStyle.addSource(geoJson)
@@ -381,6 +398,7 @@ class MapViewFragment : Fragment(), PermissionsListener, OnMapReadyCallback {
         loadedMapStyle.addSource(iconGeoJsonSource)
     }
 
+    //show route view and markers
     private fun initLayers(loadedMapStyle: Style) {
         val routeLayer = LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID)
         routeLayer.setProperties(
